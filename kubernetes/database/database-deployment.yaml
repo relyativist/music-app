@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-database
+  lebels:
+    name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchlabels:
+      name: postgres
+  template:
+    metadata:
+      name: database-pods
+      namespace: music-api
+      labels:
+        name: database
+    spec:
+      terminationGracePeriodSeconds: 180
+      containers:
+        - name: database-containers
+          image: postgres:9.6.24-alpine
+          ports:
+              containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+          volumeMounts:
+            - name: postgres-initdb
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+      volumes:
+        - name: postgres-initdb
+          hostPath:
+            path: /srv/postgres/sql
+          persistentVolumeClaim:
+            claimName: database-claim
+        
+            
+

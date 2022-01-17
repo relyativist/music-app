@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: music-api
+spec:
+  type: NodePort
+  ports:
+    - port: 5555
+      targetPort: 5555
+  selector:
+    app: music-api
